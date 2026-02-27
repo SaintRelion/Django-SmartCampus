@@ -4,6 +4,8 @@ from dotenv import load_dotenv
 
 from sr_libs.authentication.settings import *
 
+AUTHENTICATION_BACKENDS = ["accounts.backends.MultiIdentifierBackend"]
+
 AUTHENTICATION_MIDDLEWARE = MIDDLEWARE
 AUTH_USER_MODEL = "accounts.User"
 
@@ -18,6 +20,11 @@ from sr_libs.fingerprint.settings import *
 RP_ID = os.getenv("RP_ID")
 RP_NAME = os.getenv("RP_NAME")
 ORIGIN = os.getenv("ORIGIN")
+
+from sr_libs.delivery_channels.settings import *
+
+EMAIL_HOST_USER = "pyromaniac33143@gmail.com"
+EMAIL_HOST_PASSWORD = "lgun rdsg lwye vfvd"
 
 load_dotenv()
 
@@ -47,7 +54,8 @@ INSTALLED_APPS = [
     "django.contrib.staticfiles",
     "sr_libs.authentication",
     "sr_libs.fingerprint",
-    "session_control",
+    "sr_libs.otp",
+    "sr_libs.delivery_channels",
     "accounts",
 ]
 

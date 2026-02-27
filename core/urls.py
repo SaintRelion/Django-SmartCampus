@@ -5,5 +5,5 @@ urlpatterns = [
     path("admin/", admin.site.urls),
     path("api/auth/", include("sr_libs.authentication.urls")),
     path("api/device/", include("sr_libs.fingerprint.urls")),
-    path("api/session/", include("session_control.urls")),
+    path("api/otp/", include("sr_libs.otp.urls")),
 ]
