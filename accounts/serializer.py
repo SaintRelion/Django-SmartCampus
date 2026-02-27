@@ -9,7 +9,7 @@ User = get_user_model()
 class UserRegisterSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
-        fields = ["username", "password"]
+        fields = ["username", "employeeId", "email", "password"]
         read_only_fields = ["id"]
 
     def create(self, validated_data):
