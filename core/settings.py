@@ -2,6 +2,8 @@ import os
 from pathlib import Path
 from dotenv import load_dotenv
 
+load_dotenv()
+
 from sr_libs.authentication.settings import *
 
 AUTHENTICATION_BACKENDS = ["accounts.backends.MultiIdentifierBackend"]
@@ -23,10 +25,8 @@ ORIGIN = os.getenv("ORIGIN")
 
 from sr_libs.delivery_channels.settings import *
 
-EMAIL_HOST_USER = "pyromaniac33143@gmail.com"
-EMAIL_HOST_PASSWORD = "lgun rdsg lwye vfvd"
-
-load_dotenv()
+EMAIL_HOST_USER = os.getenv("EMAIL_HOST_USER")
+EMAIL_HOST_PASSWORD = os.getenv("EMAIL_HOST_PASSWORD")
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -41,7 +41,7 @@ SECRET_KEY = os.getenv("SECRET_KEY")
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ["back.opsularity.space"]
+ALLOWED_HOSTS = ["localhost"]
 
 # Application definition
 

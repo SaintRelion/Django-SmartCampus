@@ -19,20 +19,25 @@ colorama==0.4.6
 cryptography==46.0.5
 Django==6.0.2
 django-cors-headers==4.9.0
+django-eventstream==5.3.3
+django-grip==3.5.2
 django-otp==1.7.0
-django-saintrelion-libs @ git+https://github.com/SaintRelion/Django-Fastly.git@64d4cd231d774105c4bc3cf5f8f99f516073874f
+django-saintrelion-libs @ git+https://github.com/SaintRelion/Django-Fastly.git@cc8253393758f370e7bb1f3b6e910b9bd261c299
 djangorestframework==3.16.1
 djangorestframework_simplejwt==5.5.1
 frozenlist==1.8.0
 gevent==25.9.1
 greenlet==3.3.2
+gripcontrol==4.2.1
 idna==3.11
 kombu==5.6.2
+MarkupSafe==3.0.3
 multidict==6.7.1
 packaging==26.0
 prompt_toolkit==3.0.52
 propcache==0.4.1
 psycopg2-binary==2.9.11
+pubcontrol==3.5.0
 pyasn1==0.6.2
 pycparser==3.0
 PyJWT==2.11.0
@@ -50,6 +55,7 @@ urllib3==2.6.3
 vine==5.1.0
 wcwidth==0.6.0
 webauthn==2.7.1
+Werkzeug==3.1.6
 yarl==1.22.0
 zope.event==6.1
 zope.interface==8.2
