@@ -8,7 +8,9 @@ User = get_user_model()
 class MultiIdentifierBackend(ModelBackend):
     def authenticate(self, request, username=None, password=None, **kwargs):
         try:
-            user = User.objects.get(Q(employeeId=username))
+            user = User.objects.get(
+                Q(employeeId=username) | Q(username=username) | Q(email=username)
+            )
         except User.DoesNotExist:
             return None
 
