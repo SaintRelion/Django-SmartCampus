@@ -20,9 +20,10 @@ cryptography==46.0.5
 Django==6.0.2
 django-cors-headers==4.9.0
 django-eventstream==5.3.3
+django-filter==25.2
 django-grip==3.5.2
 django-otp==1.7.0
-django-saintrelion-libs @ git+https://github.com/SaintRelion/Django-Fastly.git@cc8253393758f370e7bb1f3b6e910b9bd261c299
+django-saintrelion-libs @ git+https://github.com/SaintRelion/Django-Fastly.git@8799e95d34dbeb6e45781411a26a48e469f8813a
 djangorestframework==3.16.1
 djangorestframework_simplejwt==5.5.1
 frozenlist==1.8.0
