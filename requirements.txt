@@ -23,7 +23,7 @@ django-eventstream==5.3.3
 django-filter==25.2
 django-grip==3.5.2
 django-otp==1.7.0
-django-saintrelion-libs @ git+https://oauth2:${SR_LEGACY_TOKEN}@github.com/SaintRelion/Django-SaintRelion-Libs-Legacy.git@4d20021f82723656a23179707b6e5e0ea4caa032
+django-saintrelion-libs @ git+https://oauth2:${SR_LEGACY_TOKEN}@github.com/SaintRelion/Django-SaintRelion-Libs-Legacy.git@0eb09e917862aa787b0ce309cff7a432c2c032c1
 djangorestframework==3.16.1
 djangorestframework_simplejwt==5.5.1
 frozenlist==1.8.0
