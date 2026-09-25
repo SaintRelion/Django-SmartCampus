@@ -158,3 +158,11 @@ Before a public deployment, review Django `DEBUG`/`ALLOWED_HOSTS`, use
 production secrets and HTTPS, configure the production WebAuthn
 domain/origin, remove `/setup-admin`, and do not use permissive
 Firestore rules.
+
+## Author
+
+**June Aurelius Jacinto**  
+Full-Stack Software Developer
+
+GitHub: https://github.com/SaintRelion
+
