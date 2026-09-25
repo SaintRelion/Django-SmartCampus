@@ -1,28 +1,28 @@
-# Dockerfile
+# syntax=docker/dockerfile:1.7
+
 FROM python:3.12-slim-bookworm
 
-ENV PYTHONDONTWRITEBYTECODE=1
-ENV PYTHONUNBUFFERED=1
+ENV PYTHONDONTWRITEBYTECODE=1 \
+    PYTHONUNBUFFERED=1 \
+    PIP_NO_CACHE_DIR=1
 
-RUN apt-get update && apt-get install -y \
-    build-essential \
-    libpq-dev \
-    git \
-    && rm -rf /var/lib/apt/lists/*
+WORKDIR /app
 
-RUN mkdir -p /code
+# requirements.txt contains a private GitHub dependency, so git is required.
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends git && \
+    rm -rf /var/lib/apt/lists/*
 
-WORKDIR /code
+COPY requirements.txt ./
 
-COPY requirements.txt /code/
-RUN pip install -r requirements.txt
+RUN --mount=type=secret,id=sr_django_legacy_token \
+    SR_DJANGO_LEGACY_TOKEN="$(cat /run/secrets/sr_django_legacy_token)" \
+    pip install \
+        --no-cache-dir \
+        --timeout 120 \
+        --retries 10 \
+        -r requirements.txt
 
-COPY . /code
+COPY . .
 
-RUN python manage.py migrate
-# Copy start.sh and make it executable
-COPY entrypoint.sh /code/entrypoint.sh
-RUN chmod +x /code/entrypoint.sh
-
-# Use start.sh as the container entrypoint
-ENTRYPOINT ["/code/entrypoint.sh"]
+EXPOSE 8000
