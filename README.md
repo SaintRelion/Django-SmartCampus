@@ -7,6 +7,14 @@ OTP, device checks, and WebAuthn. PostgreSQL is used as the database.
 This repository also contains `docker-compose.yml` for running the
 complete Smart Campus system.
 
+## Key features
+
+- **WebAuthn / passkey security** — backend endpoints for device registration and authentication used by the frontend's biometric/passkey flow.
+- **Email OTP verification** — supports the enrollment and account-security workflow before WebAuthn registration.
+- **Authentication and user accounts** — registration and authentication backed by the custom Smart Campus user model.
+- **Employee ID login support** — custom authentication supports the employee-based account flow used by the client.
+- **PostgreSQL persistence** — application data is backed by PostgreSQL and integrated into the full Docker stack.
+
 ## Stack
 
 Python 3.12, Django 6, Django REST Framework, PostgreSQL, Simple JWT,
