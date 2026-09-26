@@ -2,19 +2,24 @@ services:
   db:
     image: postgres:17-alpine
     container_name: smartcampus-db
+
     environment:
       POSTGRES_DB: ${DB_NAME}
       POSTGRES_USER: ${DB_USER}
       POSTGRES_PASSWORD: ${DB_PASSWORD}
+
     ports:
-      - "5435:5432"
+      - "${DB_DOCKER_PORT:-5435}:5432"
+
     volumes:
       - smartcampus_postgres:/var/lib/postgresql/data
+
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U ${DB_USER} -d ${DB_NAME}"]
       interval: 5s
       timeout: 5s
       retries: 10
+
     restart: unless-stopped
 
   backend:
@@ -23,20 +28,28 @@ services:
       dockerfile: Dockerfile
       secrets:
         - sr_django_legacy_token
+
     container_name: smartcampus-backend
+
     env_file:
       - .env
+
     environment:
       DB_HOST: db
+      DB_PORT: 5432
       ORIGIN: http://localhost:8080
+
     depends_on:
       db:
         condition: service_healthy
+
     command: >
       sh -c "python manage.py migrate --noinput &&
              uvicorn core.asgi:application --host 0.0.0.0 --port 8000"
+
     ports:
-      - "8000:8000"
+      - "${API_PORT:-8000}:8000"
+
     restart: unless-stopped
 
   frontend:
@@ -46,11 +59,15 @@ services:
       secrets:
         - sr_react_github_token
         - frontend_env
+
     container_name: smartcampus-frontend
+
     depends_on:
       - backend
+
     ports:
       - "8080:80"
+
     restart: unless-stopped
 
 volumes:
@@ -59,7 +76,9 @@ volumes:
 secrets:
   sr_react_github_token:
     environment: SR_REACT_GITHUB_TOKEN
+
   sr_django_legacy_token:
     environment: SR_DJANGO_LEGACY_TOKEN
+
   frontend_env:
     file: ../CL-Smart-Campus-System/.env

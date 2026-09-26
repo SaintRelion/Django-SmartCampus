@@ -1,68 +1,50 @@
 # Smart Campus Backend
 
-Django backend for Smart Campus. It provides authentication/security
-endpoints used by the frontend, including account registration, email
-OTP, device checks, and WebAuthn. PostgreSQL is used as the database.
-
-This repository also contains `docker-compose.yml` for running the
-complete Smart Campus system.
+Django backend for **Smart Campus**, providing the authentication and
+security services used by the React frontend. The backend handles user
+accounts, email OTP, device/passkey workflows, and PostgreSQL
+persistence.
 
 ## Key features
 
-- **WebAuthn / passkey security** — backend endpoints for device registration and authentication used by the frontend's biometric/passkey flow.
-- **Email OTP verification** — supports the enrollment and account-security workflow before WebAuthn registration.
-- **Authentication and user accounts** — registration and authentication backed by the custom Smart Campus user model.
-- **Employee ID login support** — custom authentication supports the employee-based account flow used by the client.
-- **PostgreSQL persistence** — application data is backed by PostgreSQL and integrated into the full Docker stack.
+-   **WebAuthn / passkey security** --- device registration and
+    authentication endpoints for the frontend's passkey flow.
+-   **Email OTP verification** --- supports account verification and
+    enrollment before device registration.
+-   **Authentication and user accounts** --- registration and
+    authentication using the Smart Campus user model.
+-   **Employee ID login** --- custom authentication supports
+    employee-based accounts.
+-   **PostgreSQL persistence** --- application data is stored in
+    PostgreSQL.
+-   **Dockerized full stack** --- Compose can run the React frontend,
+    Django backend, and PostgreSQL database together.
 
 ## Stack
 
-Python 3.12, Django 6, Django REST Framework, PostgreSQL, Simple JWT,
-WebAuthn, Uvicorn, and the private `django-saintrelion-libs` package.
+-   Django + Django REST Framework
+-   PostgreSQL
+-   WebAuthn / passkeys and email OTP
+-   Uvicorn / ASGI
+-   Astral `uv` for Python dependency and environment management
+-   Docker / Docker Compose
+-   Private `django-saintrelion-libs` dependency
 
-## Access to private dependencies
+## Private dependencies
 
-This project depends on private SaintRelion packages. The required access keys/tokens are **not included in this repository**.
+This project depends on private SaintRelion packages. Required access
+tokens are **not included in the repository**.
 
-If you need access to build or run the project, please contact the developer to request the required keys.
+To build the complete application, request the required credentials from
+the developer:
 
-## Setup
+-   `SR_DJANGO_LEGACY_TOKEN` --- private Django dependency
+-   `SR_REACT_GITHUB_TOKEN` --- private frontend packages
 
-Copy `.env.example` to `.env` and configure:
+## Run with Docker
 
-``` env
-SECRET_KEY=
-
-DB_NAME=smartcampus
-DB_USER=smartcampus
-DB_PASSWORD=
-DB_HOST=localhost
-DB_PORT=5432
-
-EMAIL_HOST_USER=
-EMAIL_HOST_PASSWORD=
-
-RP_ID=localhost
-RP_NAME=Smart Campus
-ORIGIN=http://localhost:5173
-```
-
-For normal local development, `DB_HOST=localhost` and `ORIGIN` should
-match the frontend Vite URL.
-
-Install the Python dependencies and run the backend using the project's
-normal Django/ASGI workflow:
-
-``` bash
-pip install -r requirements.txt
-```
-
-The private Django SaintRelion dependency requires
-`SR_DJANGO_LEGACY_TOKEN` while installing.
-
-## Full application with Docker
-
-Keep both repositories beside each other:
+The simplest way to run the project is with Docker Compose. Keep the
+frontend and backend repositories beside each other:
 
 ``` text
 SmartCampus/
@@ -70,62 +52,59 @@ SmartCampus/
 │   └── .env
 └── Django-SmartCampus/
     ├── .env
+    ├── Dockerfile
     └── docker-compose.yml
 ```
 
-Before building, provide the two private package tokens in your shell:
+Copy `.env.example` to `.env` and provide the required application
+values. Then expose the private package credentials in your shell.
 
-``` text
-SR_DJANGO_LEGACY_TOKEN
-SR_REACT_GITHUB_TOKEN
-```
-
-Example PowerShell:
+PowerShell:
 
 ``` powershell
 $env:SR_DJANGO_LEGACY_TOKEN="YOUR_TOKEN"
 $env:SR_REACT_GITHUB_TOKEN="YOUR_TOKEN"
-```
 
-Then, from `Django-SmartCampus`:
-
-``` bash
 docker compose up -d --build
 ```
 
-The stack runs:
+Compose starts:
 
 ``` text
-Frontend   http://localhost:8080
-Backend    http://localhost:8000
-Database   PostgreSQL (`db` inside Compose)
+Frontend     http://localhost:8080
+Backend      http://localhost:8000
+PostgreSQL   localhost:5435
 ```
 
-Compose overrides the local-only values needed inside Docker:
+The backend waits for PostgreSQL, applies Django migrations, and then
+starts the ASGI application with Uvicorn.
 
-``` yaml
-environment:
-  DB_HOST: db
-  ORIGIN: http://localhost:8080
-```
+Inside Docker, Compose overrides environment values that differ from
+local development, including the database host and WebAuthn frontend
+origin.
 
-This lets the same backend `.env` remain suitable for local development
-(`localhost:5173`) while Docker uses the frontend served on port `8080`.
+Useful commands:
 
-Check the containers with:
-
-``` bash
+``` powershell
 docker compose ps
-```
-
-Stop them with:
-
-``` bash
+docker compose logs -f --tail=100 backend
+docker compose logs -f --tail=100 frontend
 docker compose down
 ```
 
-Do not add `-v` unless you intentionally want to delete the PostgreSQL
-volume.
+Do not use `docker compose down -v` unless you intentionally want to
+delete the PostgreSQL volume.
+
+### Dependency management
+
+Python dependencies are managed with **Astral uv** through
+`pyproject.toml` and `uv.lock`. The Docker image also uses
+`uv sync --frozen` so the container installs the locked dependency graph
+rather than maintaining a separate `requirements.txt` installation path.
+
+The private Django dependency is fetched during the Docker build using a
+BuildKit secret; the access token is not stored in `pyproject.toml` or
+committed to the repository.
 
 ## First administrator
 
@@ -136,41 +115,115 @@ frontend's temporary:
 /setup-admin
 ```
 
-After creation, sign in through `/login` and complete the existing email
-OTP and WebAuthn/fingerprint setup.
+After creating the account, sign in through `/login` and complete the
+existing email OTP and WebAuthn/passkey setup.
 
-Remove the frontend `/setup-admin` page and route after the first
-administrator is created.
+The `/setup-admin` route is intended only for initial setup and should
+be removed or disabled after the first administrator is created.
 
-## WebAuthn
+## WebAuthn configuration
 
-For local Vite development:
+For local frontend development:
 
 ``` env
 RP_ID=localhost
 ORIGIN=http://localhost:5173
 ```
 
-For Docker, Compose overrides the origin to:
+For the Docker frontend:
 
-``` text
-http://localhost:8080
+``` env
+RP_ID=localhost
+ORIGIN=http://localhost:8080
 ```
 
-`RP_ID` remains `localhost`; it does not include a scheme or port.
+`RP_ID` is the relying-party domain only; it does not include a scheme
+or port.
+
+## Local setup without Docker
+
+This section is only needed if you want to run the Django backend
+directly on your machine.
+
+### 1. Install uv
+
+On Windows:
+
+``` powershell
+winget install --id=astral-sh.uv -e
+```
+
+Verify:
+
+``` powershell
+uv --version
+```
+
+The repository uses `pyproject.toml` and `uv.lock`, so restore the
+environment with:
+
+``` powershell
+uv sync
+```
+
+### 2. Configure PostgreSQL
+
+Create a PostgreSQL database and configure `.env` for your local
+instance:
+
+``` env
+DB_HOST=localhost
+DB_PORT=5432
+DB_NAME=smartcampus
+DB_USER=smartcampus
+DB_PASSWORD=
+
+SECRET_KEY=
+
+EMAIL_HOST_USER=
+EMAIL_HOST_PASSWORD=
+
+RP_ID=localhost
+RP_NAME=Smart Campus
+ORIGIN=http://localhost:5173
+```
+
+The private Django package still requires access to the SaintRelion
+repository when dependencies need to be installed.
+
+### 3. Run Django
+
+The application source lives under `src/`.
+
+Apply migrations:
+
+``` powershell
+uv run python src/manage.py migrate
+```
+
+Start the ASGI server:
+
+``` powershell
+uv run uvicorn --app-dir src core.asgi:application --reload --host 127.0.0.1 --port 8000
+```
+
+The frontend can then use:
+
+``` text
+http://localhost:8000
+```
 
 ## Before production
 
-The current source is configured primarily for development/restoration.
-Before a public deployment, review Django `DEBUG`/`ALLOWED_HOSTS`, use
-production secrets and HTTPS, configure the production WebAuthn
-domain/origin, remove `/setup-admin`, and do not use permissive
-Firestore rules.
+The current configuration is intended primarily for
+development/restoration. Before public deployment, review Django `DEBUG`
+and `ALLOWED_HOSTS`, use production secrets and HTTPS, configure the
+production WebAuthn domain/origin, and remove or disable the initial
+`/setup-admin` flow.
 
 ## Author
 
-**June Aurelius Jacinto**  
+**June Aurelius Jacinto**\
 Full-Stack Software Developer
 
 GitHub: https://github.com/SaintRelion
-
